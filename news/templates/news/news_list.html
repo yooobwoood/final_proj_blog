@@ -1,0 +1,30 @@
+{% extends 'news/base.html' %}
+
+{% block main_area %}
+    <h1>뉴스 달력</h1>
+
+    {% if user.is_authenticated %}
+        {% if user.is_superuser or user.is_staff %}
+            <div style="text-align: right;">
+                <a href="{% url 'news_create' %}" class="btn btn-secondary"><i class="fas fa-pen"></i>&nbsp;&nbsp;New News</a>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <div class="calendar">
+        {% for date, news_list in news_by_date.items %}
+            <div class="calendar-day">
+                <h3>{{ date }}</h3>
+                <ul>
+                    {% for news in news_list %}
+                        <li>
+                            <a href="{% url 'news_detail' news.pk %}">{{ news.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% empty %}
+            <p>뉴스가 없습니다.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'news/base.html' %}
+
+{% block head_title %}
+    {{ news.title }} - News
+{% endblock %}
+
+{% block main_area %}
+    <div id="news-area">
+
+        {% if user.is_authenticated and user == news.author %}
+            <div style="text-align: right;">
+                <a href="/news/update_post/{{ news.pk }}/" class="btn btn-secondary"><i class="fas fa-pen"></i>&nbsp;&nbsp;Edit News</a>
+            </div>
+        {% endif %}
+
+        <!-- Title -->
+        <h1 class="mt-4">{{ news.title }}</h1>
+
+        <hr>
+
+        <!-- Date/Time -->
+        <p>Posted on {{ news.created_at }}</p>
+        <hr>
+
+        <hr>
+        <!-- Post Content -->
+        <p>{{ news.get_content_markdown | safe }}</p>
+
+        <hr>
+    </div>
+
+
+{% endblock %}

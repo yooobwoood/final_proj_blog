@@ -1,0 +1,48 @@
+
+
+{% extends "common/base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg">
+                <div class="card-header text-center bg-secondary text-white">
+                    <h3>로그인</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" action="{% url 'common:login' %}">
+                        {% csrf_token %}
+                        {% include "form_errors.html" %}
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label">사용자 ID</label>
+                            <input type="text" class="form-control" name="username" id="username"
+                                   placeholder="아이디를 입력하세요"
+                                   value="{{ form.username.value|default_if_none:'' }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">비밀번호</label>
+                            <input type="password" class="form-control" name="password" id="password"
+                                   placeholder="비밀번호를 입력하세요"
+                                   value="{{ form.password.value|default_if_none:'' }}">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-secondary btn-block">로그인</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <small class="text-muted">
+                        <a href="#">비밀번호를 잊으셨나요?</a><br>
+                        <a href="{% url 'common:signup' %}">회원가입</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

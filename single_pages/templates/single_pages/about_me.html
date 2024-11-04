@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+    <title> About 달타냥 </title>
+    <script src="https://kit.fontawesome.com/726bbd6862.js" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body style="padding-bottom: 200px; background-color: #f4f4f4; color: #333;">
+
+{% include 'blog/navbar.html' %}
+
+<section class="my-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="display-4">정수빈(丁秀彬)</h3>
+                <p class="lead mt-3">
+                    나이 : 만 27세<br/>
+                    혈액형 : AB형<br/>
+                    MBTI : ENFJ<br/><br/>
+                    "경제와 금융에 관심이 많아요!"<br/>
+                    "궁금하신 것이 있으면 언제든 물어봐주세요!"
+                </p>
+            </div>
+            <div class="col-lg-4">
+                <img class="img-fluid rounded-circle shadow" src="{% static 'single_pages/images/정수빈.png' %}" alt="정수빈 이미지" style="max-height: 300px;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h1 class="display-4">about me</h1>
+            <p class="lead">저를 소개할게요.</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow">
+                    <img class="card-img-top" src="{% static 'single_pages/images/교생생활.png' %}" alt="">
+                    <div class="card-body">
+                        <h5 class="card-title">제 교생시절 사진이에요!</h5>
+                        <p class="card-text">제가 경북 교대 다닐 때, 대구중학교로 교생 실습을 나갔었어요.</p>
+                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#pycon2017">자세히 보기</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow">
+                    <img class="card-img-top" src="{% static 'single_pages/images/취미2.png' %}" alt="인프런 강의 이미지">
+                    <div class="card-body">
+                        <h5 class="card-title">제 취미는 러닝이에요!</h5>
+                        <p class="card-text">제 강아지 코코도 저와 함께 뛰는 걸 좋아해요.</p>
+                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#inflearn_django2">자세히 보기</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow">
+                    <img class="card-img-top" src="{% static 'single_pages/images/봉사.png' %}" alt="업무자동화 강의 이미지">
+                    <div class="card-body">
+                        <h5 class="card-title">봉사활동 사진이에요!</h5>
+                        <p class="card-text">여유가 있는 주말에는 경북보육원에 봉사활동을 다녀요.</p>
+                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#automation_python">자세히 보기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Modal for PyCon 2017 -->
+<div class="modal fade" id="pycon2017" tabindex="-1" role="dialog" aria-labelledby="pycon2017ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pycon2017ModalLabel">교생시절</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <img class="img-fluid" src="{% static 'single_pages/images/교생생활.png' %}" alt="PyCon 2017 발표 이미지">
+                    </div>
+                    <div class="col-lg-5">
+                        <p>2020년 가을 학기 때 한 학기 동안 교생 실습을 했었어요. 그때부터 학생들을 가르치는 일이 제 적성에 맞다는 것을 깨달았었죠.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Inflearn Django 2 -->
+<div class="modal fade" id="inflearn_django2" tabindex="-1" role="dialog" aria-labelledby="inflearnDjangoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inflearnDjangoModalLabel">취미</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <img class="img-fluid" src="{% static 'single_pages/images/취미2.png' %}" alt="인프런 강의 이미지">
+                    </div>
+                    <div class="col-lg-5">
+                        <p>매일 아침 일찍 일어나 코코와 함께 러닝을 다녀오면, 기분 좋게 하루를 시작할 수 있어요.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Automation Python -->
+<div class="modal fade" id="automation_python" tabindex="-1" role="dialog" aria-labelledby="automationPythonModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="automationPythonModalLabel">봉사활동</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <img class="img-fluid" src="{% static 'single_pages/images/봉사.png' %}" alt="업무 자동화 강의 이미지">
+                    </div>
+                    <div class="col-lg-5">
+                        <p>경북보육원으로 교육봉사를 다니기 시작한지 벌써 1년이 넘었어요. 우리 아이들이 저를 정말 좋아해요.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="fixed-bottom">
+    {% include 'blog/footer.html' %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- Popper.js, required for Bootstrap's JavaScript plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

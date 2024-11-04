@@ -1,0 +1,95 @@
+{% extends 'today_word/base.html' %}
+
+{% block main_area %}
+
+{% if user.is_authenticated %}
+    {% if user.is_superuser or user.is_staff %}
+        <div style="text-align: right;">
+            <a href="./create_post/" class="btn btn-secondary"><i class="fas fa-pen"></i>&nbsp;&nbsp;New Word</a>
+        </div>
+    {% endif %}
+{% endif %}
+
+
+<h1>
+    오늘의 단어
+    {% if search_info %}<small class="text-muted">{{ search_info }}</small>{% endif %}
+    {% if tag %}<span class="badge rounded-pill text-bg-light"><i class="fas fa-tags"></i>{{ tag }}</span>{% endif %}
+</h1>
+
+{% if word_list.exists %}
+    {% for w in word_list %}
+    <!-- Blog Post -->
+    <div class="card mb-4" id="word-{{ w.pk }}">
+
+        <div class="card-body">
+
+            <h2 class="card-title">{{ w.title}}</h2>
+
+            <p class="card-text">{{ w.get_content_markdown | truncatewords_html:45 | safe }}</p>
+
+            {% if w.tags.exists %}
+            <i class="fas fa-tags"></i>
+                {% for tag in w.tags.iterator %}
+                <a href="{% url 'word_search' tag.name %}"><span class="badge rounded-pill text-bg-light">{{ tag }}</span></a>
+                {% endfor %}
+                <br/>
+                <br/>
+            {% endif %}
+
+            <a href="{{ w.get_absolute_url }}" class="btn btn-secondary">Read More &rarr;</a>
+        </div>
+
+        <div class="card-footer text-muted">
+            Posted on {{ w.created_at}}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <h3>아직 게시물이 없습니다.</h3>
+{% endif %}
+
+{% if is_paginated %}
+    <!-- Pagination -->
+    <ul class="pagination justify-content-center mb-4">
+
+        <!-- Newer 버튼 (이전 페이지로 이동) -->
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&larr;</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#">&larr;</a>
+            </li>
+        {% endif %}
+
+        <!-- 페이지 번호 표시 (최대 5개) -->
+        {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+                <!-- 현재 페이지 -->
+                <li class="page-item active">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+                <!-- 근처의 페이지 (현재 페이지 앞뒤 2개씩) -->
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        <!-- Older 버튼 (다음 페이지로 이동) -->
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">&rarr;</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#">&rarr;</a>
+            </li>
+        {% endif %}
+    </ul>
+{% endif %}
+
+{% endblock %}

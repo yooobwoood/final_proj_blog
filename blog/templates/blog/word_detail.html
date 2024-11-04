@@ -1,0 +1,46 @@
+{% extends 'today_word/base.html' %}
+
+{% block head_title %}
+    {{ word.title }} - Today Word
+{% endblock %}
+
+{% block main_area %}
+
+    <div id="post-area">
+
+        {% if user.is_authenticated and user == word.author %}
+            <div style="text-align: right;">
+                <a href="/today_word/update_post/{{ word.pk }}/" class="btn btn-secondary"><i class="fas fa-pen"></i>&nbsp;&nbsp;Edit Word</a>
+            </div>
+        {% endif %}
+
+        <!-- Title -->
+        <h1 class="mt-4">{{ word.title }}</h1>
+        <!-- Author -->
+<!--        <p class="lead">-->
+<!--          by-->
+<!--          <a href="#">{{ word.author | upper }}</a>-->
+<!--        </p>-->
+        <hr>
+
+        <!-- Date/Time -->
+        <p>Posted on {{ word.created_at }}</p>
+        <hr>
+
+        <hr>
+        <!-- Post Content -->
+        <p>{{ word.get_content_markdown | safe }}</p>
+
+        {% if word.tags.exists %}
+            <i class="fas fa-tags"></i>
+            {% for tag in word.tags.all %}
+                <a href="{% url 'word_search' tag.name %}"><span class="badge rounded-pill text-bg-light">{{ tag }}</span></a>
+            {% endfor %}
+            <br/>
+            <br/>
+        {% endif %}
+
+        <hr>
+    </div>
+
+{% endblock %}
