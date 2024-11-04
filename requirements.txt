@@ -13,6 +13,7 @@ django-allauth==65.0.2
 django-crispy-forms==2.3
 django-extensions==3.2.3
 django-markdownx==4.0.7
+exceptiongroup==1.2.2
 executing==2.1.0
 idna==3.10
 ipython==8.28.0
@@ -20,9 +21,11 @@ jedi==0.19.1
 Markdown==3.7
 matplotlib-inline==0.1.7
 parso==0.8.4
+pexpect==4.9.0
 pillow==10.4.0
-pip==23.2.1
 prompt_toolkit==3.0.48
+psycopg2-binary==2.9.10
+ptyprocess==0.7.0
 pure_eval==0.2.3
 pycparser==2.22
 Pygments==2.18.0
@@ -33,6 +36,7 @@ soupsieve==2.6
 sqlparse==0.5.1
 stack-data==0.6.3
 traitlets==5.14.3
+typing_extensions==4.12.2
 tzdata==2024.2
 urllib3==2.2.3
 wcwidth==0.2.13
