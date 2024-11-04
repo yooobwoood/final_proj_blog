@@ -168,3 +168,6 @@ _media/
 
 
 .DS_Store
+
+.env.prod 
+.env.prod.db
