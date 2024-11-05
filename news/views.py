@@ -1,34 +1,41 @@
-from django.shortcuts import render, redirect
+from lib2to3.fixes.fix_input import context
+from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils.text import slugify
-from django.shortcuts import get_object_or_404
-from blog.models import Post, Tag, Comment, News
+from blog.models import Tag, News
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from blog.forms import CommentForm
-from django.utils.timezone import localdate
 from collections import defaultdict
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 
 class NewsList(ListView):
     model = News
     template_name = 'news/news_list.html'
-    context_object_name = 'news'
+    context_object_name = 'news_list'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        news_by_date = defaultdict(list)
+        
+        # 날짜별 뉴스 데이터를 딕셔너리로 그룹화
+        news_dict = defaultdict(list)
 
-        # Organize news by their creation date
         for news in News.objects.all():
-            date_only = news.created_at.date()  # 날짜만 추출
-            news_by_date[date_only].append(news)
+            date_key = news.created_at.strftime('%Y-%m-%d')
+            news_dict[date_key].append({'title': news.title, 'url': news.get_absolute_url()})
+        
+        # JSON 형식으로 템플릿에 전달
+        context['news_dict'] = news_dict
+        
+        # 오늘 날짜의 뉴스 필터링
+        today = timezone.now().date()
+        today_news = News.objects.filter(created_at__date=today)
+        
+        # 템플릿에 전달
+        context['today_news'] = today_news
 
-        context['news_by_date'] = news_by_date
         return context
 
 class NewsDetail(DetailView):
@@ -36,7 +43,14 @@ class NewsDetail(DetailView):
     template_name = 'news/news_detail.html'
 
     def get_context_data(self, **kwargs):
-        context = super(NewsDetail, self).get_context_data()
+        context = super().get_context_data(**kwargs)
+        
+        # 오늘 날짜의 뉴스 필터링
+        today = timezone.now().date()
+        today_news = News.objects.filter(created_at__date=today)
+        
+        # 템플릿에 전달
+        context['today_news'] = today_news
         context['comment_form'] = CommentForm
         return context
 

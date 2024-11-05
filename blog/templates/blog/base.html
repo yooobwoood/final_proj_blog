@@ -38,7 +38,7 @@
         <div class="col-md-4 col-lg-3">
             <!-- Search Widget -->
             <div class="card my-4" id="search-widget">
-                <h5 class="card-header">Blog Search</h5>
+                <h5 class="card-header">Post Search</h5>
                 <div class="card-body">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search for..." id="search-input">
@@ -49,12 +49,18 @@
                 </div>
             </div>
 
-            <!-- Categories Widget -->
-            <div class="card my-4 sticky-widget" id="">
-                <h5 class="card-header">News</h5>
+            <!-- News Widget -->
+            <div class="card my-4 sticky-widget" id="categories-card">
+                <h5 class="card-header">오늘의 뉴스</h5>
                 <div class="card-body">
-                    <div class="row">
-                    </div>
+                    <ul id="today-news-list" style="list-style-type: none; padding-left: 0;">
+                        {% for news in today_news %}
+                            <!-- 뉴스 제목 클릭 시 상세 페이지로 이동 -->
+                            <li><a href="{{ news.get_absolute_url }}">{{ news.title }}</a></li>
+                        {% empty %}
+                            <li>오늘의 뉴스가 없습니다.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>

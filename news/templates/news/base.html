@@ -36,24 +36,20 @@
             {% endblock %}
         </div>
         <div class="col-md-4 col-lg-3">
-            <!-- Search Widget -->
-            <div class="card my-4">
-                <h5 class="card-header">News Search</h5>
-                <div class="card-body">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for..." id="search-input">
-                        <span class="input-group-btn">
-                                <button class="btn btn-secondary" type="button" onclick="searchPost();">Go!</button>
-                            </span>
-                    </div>
-                </div>
-            </div>
-            <!-- Categories Widget -->
+            
+            <!-- News Widget -->
             <div class="card my-4 sticky-widget" id="categories-card">
                 <h5 class="card-header">Word Categories</h5>
+                <h5 class="card-header">오늘의 뉴스</h5>
                 <div class="card-body">
-                    <div class="row">
-                    </div>
+                    <ul id="today-news-list" style="list-style-type: none; padding-left: 0;">
+                        {% for news in today_news %}
+                            <!-- 뉴스 제목 클릭 시 상세 페이지로 이동 -->
+                            <li><a href="{{ news.get_absolute_url }}">{{ news.title }}</a></li>
+                        {% empty %}
+                            <li>오늘의 뉴스가 없습니다.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
@@ -61,20 +57,16 @@
 </div>
 
 <script>
-    function searchPost(){
-        let searchValue = document.getElementById('search-input').value.trim();
-        if (searchValue.length > 1){
-            location.href="/news/search/" + searchValue + "/";
-        }
-        else{
-            alert('검색어('+ searchValue +')가 너무 짧습니다.');
-        }
-    };
-    document.getElementById('search-input').addEventListener('keyup', function(event){
-        if(event.key === 'Enter'){
-            searchPost();
-        }
-    });
+    const newsData = JSON.parse(document.getElementById('news-data').textContent);
+    const today = new Date().toISOString().split('T')[0];
+    const newsList = document.getElementById('today-news-list');
+    if (newsData[today]) {
+        newsList.innerHTML = newsData[today].map(news =>
+            `<li><a href="${news.url}">${news.title}</a></li>`
+        ).join('');
+    } else {
+        newsList.innerHTML = '<li>오늘의 뉴스가 없습니다.</li>';
+    }
 </script>
 
 

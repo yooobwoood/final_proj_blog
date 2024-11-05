@@ -27,43 +27,52 @@
 
 
     <div class="container mt-5">
-        <div class="row justify-content-between" style="gap: 40px;">
-            <!-- Left Column: "오늘의 단어" and "최근 게시글" -->
-            <div class="col-lg-7 d-flex flex-column">
-                <!-- Section for "오늘의 단어" -->
-                <div class="mb-5" style="background-color: #fff; padding: 30px; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-                    <h2 class="text-dark" style="font-weight: 700; font-size: 1.75rem; color: #333;">오늘의 단어</h2>
+        <div class="row justify-content-between" style="gap: 20px;">
+            <!-- Left Column: "오늘의 단어" and "오늘의 뉴스" -->
+            <div class="col-lg-3 d-flex flex-column">
+                <!-- "오늘의 단어" 섹션 -->
+                <div class="mb-4" style="background-color: #fff; padding: 20px; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                    <h4 class="text-dark" style="font-weight: 700; font-size: 1.5rem; color: #333;">오늘의 단어</h4>
                     {% for word in recent_word %}
                         <div class="card mt-3" style="border-radius: 0; box-shadow: none; border: 1px solid #ccc;">
-                            <div class="card-body" style="padding: 15px;">
-                                <h1><a href="{{ word.get_absolute_url }}" class="text-decoration-none" style="font-size: 1.5rem; font-weight: 600; color: #000;">{{ word.title }}</a></h1>
-                                <h4 style="font-size: 1rem; color: #666;"><a class="text-decoration-none" style="color: #666;">{{ word.get_content_markdown | truncatewords_html:45 | safe }}</a></h4>
+                            <div class="card-body" style="padding: 10px;">
+                                <h5><a href="{{ word.get_absolute_url }}" class="text-decoration-none" style="font-size: 1.25rem; font-weight: 600; color: #000;">{{ word.title }}</a></h5>
+                                <p style="font-size: 1rem; color: #666;">{{ word.get_content_markdown | truncatewords_html:20 | safe }}</p>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
 
-                <!-- Section for "최근 게시글" -->
-                <div style="background-color: #fff; padding: 30px; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-                    <h2 class="text-dark" style="font-weight: 700; font-size: 1.75rem; color: #333;">최근 게시글</h2>
-                    {% for post in recent_posts %}
-                        <div class="card mt-3" style="border-radius: 0; box-shadow: none; border: 1px solid #ccc;">
-                            <div class="card-body" style="padding: 15px;">
-                                <h6><a href="{{ post.get_absolute_url }}" class="text-decoration-none" style="font-size: 1.25rem; font-weight: 600; color: #000;">{{ post.title }}</a></h6>
-                                <span class="badge" style="background-color: #333; color: white; padding: 5px 10px; border-radius: 0;">
-                                    {{ post.author.username }} &nbsp;&nbsp; {{ post.created_at }}
-                                </span>
-                            </div>
-                        </div>
-                    {% endfor %}
+                <!-- "오늘의 뉴스" 섹션 -->
+                <div style="background-color: #fff; padding: 20px; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                    <h4 class="text-dark" style="font-weight: 700; font-size: 1.5rem; color: #333;">오늘의 뉴스</h4>
+                    <ul style="list-style: none; padding-left: 0;">
+                        {% for news in today_news %}
+                            <li><a href="{{ news.get_absolute_url }}" class="text-decoration-none" style="font-size: 1rem; color: #333;">{{ news.title }}</a></li>
+                        {% empty %}
+                            <li>오늘의 뉴스가 없습니다.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
 
-            <!-- Right Column: Profile Picture and Short Introduction -->
-            <div class="col-lg-4" style="background-color: #fff; padding: 30px; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); text-align: center;">
+            <!-- Center Column: "최근 게시글" -->
+            <div class="col-lg-5" style="background-color: #fff; padding: 20px; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                <h4 class="text-dark" style="font-weight: 700; font-size: 1.5rem; color: #333;">최근 게시글</h4>
+                {% for post in recent_posts %}
+                    <div class="card mt-3" style="border-radius: 0; box-shadow: none; border: 1px solid #ccc;">
+                        <div class="card-body" style="padding: 15px;">
+                            <h5><a href="{{ post.get_absolute_url }}" class="text-decoration-none" style="font-size: 1.25rem; font-weight: 600; color: #000;">{{ post.title }}</a></h5>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Right Column: Profile Picture and Introduction -->
+            <div class="col-lg-3" style="background-color: #fff; padding: 20px; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); text-align: center;">
                 <img src="/static/single_pages/images/정수빈.png" alt="Profile Picture" style="width: 100%; height: auto; object-fit: cover; border: 1px solid #ccc;">
-                <h3 class="mt-4" style="font-weight: 700; color: #333;">Your Name</h3>
-                <p style="font-size: 1rem; color: #666;">I am passionate about exploring new business opportunities and creating value that didn’t exist before. With a background in business management, I have focused on entrepreneurship and strategy to build innovative solutions in the food industry.</p>
+                <h4 class="mt-4" style="font-weight: 700; color: #333;">정수빈</h4>
+                <p style="font-size: 1rem; color: #666;">경제 전문가 수빈이에요! 어려운 경제, 함께 공부해봐요!</p>
             </div>
         </div>
     </div>
@@ -83,7 +92,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
-
 
 </html>
 

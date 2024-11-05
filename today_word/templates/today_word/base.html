@@ -48,12 +48,19 @@
                     </div>
                 </div>
             </div>
-            <!-- Categories Widget -->
+            <!-- News Widget -->
             <div class="card my-4 sticky-widget" id="categories-card">
                 <h5 class="card-header">Word Categories</h5>
+                <h5 class="card-header">오늘의 뉴스</h5>
                 <div class="card-body">
-                    <div class="row">
-                    </div>
+                    <ul id="today-news-list" style="list-style-type: none; padding-left: 0;">
+                        {% for news in today_news %}
+                            <!-- 뉴스 제목 클릭 시 상세 페이지로 이동 -->
+                            <li><a href="{{ news.get_absolute_url }}">{{ news.title }}</a></li>
+                        {% empty %}
+                            <li>오늘의 뉴스가 없습니다.</li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>

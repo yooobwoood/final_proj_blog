@@ -71,7 +71,6 @@ class Comment(models.Model):
         return f'{self.post.get_absolute_url()}#comment-{self.pk}'
 
 
-
 class Word(models.Model):
     title = models.CharField(max_length=30)
     content = MarkdownxField()

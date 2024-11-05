@@ -2,18 +2,10 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils.text import slugify
-from django.shortcuts import get_object_or_404
-from blog.models import Word, Word_Tag
+from blog.models import Word, Word_Tag, News
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from blog.forms import CommentForm
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-
-
-
-
+from django.utils import timezone
 
 
 class WordList(ListView):
@@ -24,6 +16,11 @@ class WordList(ListView):
     def get_context_data(self, **kwargs):
         context = super(WordList, self).get_context_data(**kwargs)
         context['tags'] = Word_Tag.objects.all()
+        # 오늘 날짜의 뉴스 필터링
+        today = timezone.now().date()
+        today_news = News.objects.filter(created_at__date=today)
+        # 템플릿에 전달
+        context['today_news'] = today_news
         return context
 
 class WordDetail(DetailView):
@@ -32,6 +29,11 @@ class WordDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super(WordDetail, self).get_context_data()
         context['tags'] = Word_Tag.objects.all()
+        # 오늘 날짜의 뉴스 필터링
+        today = timezone.now().date()
+        today_news = News.objects.filter(created_at__date=today)
+        # 템플릿에 전달
+        context['today_news'] = today_news
         return context
 
 class WordCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
