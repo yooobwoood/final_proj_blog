@@ -3,12 +3,13 @@
 services:
   web:  
     build: .
-    command: gunicorn final_proj_blog.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn --workers=1 final_proj_blog.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./:/usr/src/app
     ports:
       - 8000:8000
     env_file:
+      - ./.env
       - ./.env.dev
     depends_on:
       - db

@@ -6,7 +6,20 @@ from blog.models import Word, Word_Tag, News
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.utils import timezone
+from .words700 import (
+    initialize_rag_system,
+    generate_answer,
+    generate_debug_output,
+    generate_response
+)
+from django.http import JsonResponse
+import os
 
+# OpenAI API 키 가져오기
+openai_api_key = os.getenv("OPENAI_API_KEY")
+
+# RAG 시스템 초기화
+hybrid_retriever, tokenizer, model, llm_chain = initialize_rag_system()
 
 class WordList(ListView):
     model = Word
@@ -39,7 +52,7 @@ class WordDetail(DetailView):
 class WordCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Word
     fields = ['title', 'content']
-    template_name = 'today_word/create_new_word.html'  # 생성한 템플릿 파일을 지정
+    template_name = 'today_word/create_new_word.html'
 
     def test_func(self):
         return self.request.user.is_superuser or self.request.user.is_staff
@@ -69,6 +82,28 @@ class WordCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         else:
             return redirect('/today_word/')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get("query", "")
+        if query:
+            unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
+            debug_output = generate_debug_output(unique_documents, reranked_documents)
+            response = generate_response(query, reranked_documents, llm_chain)
+            context['response'] = response
+            context['debug_output'] = debug_output
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' and 'query' in request.GET:
+            query = request.GET.get('query', "")
+            unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
+            debug_output = generate_debug_output(unique_documents, reranked_documents)
+            response = generate_response(query, reranked_documents, llm_chain)
+            return JsonResponse({
+                "response": response,
+                "debug_output": debug_output
+            })
+        return super().get(request, *args, **kwargs)
 
 class WordUpdate(LoginRequiredMixin, UpdateView):
     model = Word

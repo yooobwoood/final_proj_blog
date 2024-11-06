@@ -9,8 +9,17 @@ from django.db.models import Q
 from .forms import CommentForm
 from django.utils import timezone
 from django.utils.text import slugify
+from .easystory import (
+    initialize_rag_system,
+    generate_answer,
+    generate_debug_output,
+    generate_response
+)
+from django.http import JsonResponse
+import os
 
-
+# RAG 시스템 초기화
+hybrid_retriever, tokenizer, model, llm_chain = initialize_rag_system()
 
 class PostList(ListView):
     model = Post
@@ -26,8 +35,7 @@ class PostList(ListView):
         context['today_news'] = today_news
         context['comment_form'] = CommentForm
         return context
-
-
+    
 class PostDetail(DetailView):
     model = Post
 
@@ -41,10 +49,66 @@ class PostDetail(DetailView):
         context['comment_form'] = CommentForm
         return context
 
+class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Post
+    fields = ['title', 'content', 'head_image']
+    template_name = 'blog/create_new_post.html'
+
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.is_staff
+
+    def form_valid(self, form):
+        current_user = self.request.user
+        if current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
+            form.instance.author = current_user
+
+            # Save the form to create self.object
+            response = super(PostCreate, self).form_valid(form)
+
+            # 태그 추가
+            tags_str = self.request.POST.get('tags_str')
+            if tags_str:
+                tags_str = tags_str.strip().replace(',', ';')
+                tags_list = tags_str.split(';')
+                for t in tags_list:
+                    t = t.strip()
+                    tag, is_tag_created = Tag.objects.get_or_create(name=t)
+                    if is_tag_created:
+                        tag.slug = slugify(t, allow_unicode=True)
+                        tag.save()
+                    self.object.tags.add(tag)
+
+            return response
+        else:
+            return redirect('/blog/')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get("query", "")
+        if query:
+            unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
+            debug_output = generate_debug_output(unique_documents, reranked_documents)
+            response = generate_response(query, reranked_documents, llm_chain)
+            context['response'] = response
+            context['debug_output'] = debug_output
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' and 'query' in request.GET:
+            query = request.GET.get('query', "")
+            unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
+            debug_output = generate_debug_output(unique_documents, reranked_documents)
+            response = generate_response(query, reranked_documents, llm_chain)
+            return JsonResponse({
+                "response": response,
+                "debug_output": debug_output
+            })
+        return super().get(request, *args, **kwargs)
+    
+
 class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Post
     fields = ['title', 'content', 'head_image']
-
     template_name = 'blog/post_update_form.html'
 
     def get_context_data(self, **kwargs):
@@ -117,12 +181,14 @@ def delete_comment(request, pk):
 
 class PostSearch(PostList):
     paginate_by = None
+
     def get_queryset(self):
         q = self.kwargs['q']
         post_list = Post.objects.filter(
             Q(title__contains=q)
         ).distinct()
         return post_list
+
     def get_context_data(self, **kwargs):
         context = super(PostSearch, self).get_context_data()
         q = self.kwargs['q']
