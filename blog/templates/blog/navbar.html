@@ -33,6 +33,7 @@
                             {{ user.username }}
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="{% url 'common:profile_update' %}">Profile Update</a>
                             <a class="dropdown-item" href="{% url 'common:logout' %}">Sign Out</a>
                         </div>
                     </li>
