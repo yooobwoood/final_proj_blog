@@ -32,8 +32,19 @@ ENV CUDA_VISIBLE_DEVICES=""
 ENV PYTORCH_ENABLE_MPS_FALLBACK=0  
 ENV TORCH_DEVICE="cpu"  
 
-# 프로젝트 파일 복사
-COPY . /usr/src/app/
+RUN mkdir /home
+WORKDIR /home
+
+RUN git clone https://github.com/yooobwoood/final_proj_blog.git
+
+
+WORKDIR /home/final_proj_blog
+
+COPY .env .
+COPY .env.dev .
+COPY .env.prod .
+COPY .env.prod.db .
+
 
 # Python 패키지 설치
 RUN pip install --upgrade pip
