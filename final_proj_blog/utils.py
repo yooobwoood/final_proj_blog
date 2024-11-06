@@ -9,9 +9,8 @@ def download_index_from_s3(file_name, local_path):
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     )
-    bucket_name = settings.AWS_STORAGE_BUCKET_NAME
+    bucket_name = settings.AWS_S3_BUCKET_NAME
     s3.download_file(bucket_name, file_name, local_path)
-
 
 
 
