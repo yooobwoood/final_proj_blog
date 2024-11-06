@@ -32,14 +32,10 @@ ENV CUDA_VISIBLE_DEVICES=""
 ENV PYTORCH_ENABLE_MPS_FALLBACK=0  
 ENV TORCH_DEVICE="cpu"  
 
-RUN mkdir /home
-WORKDIR /home
-
+WORKDIR /
 RUN git clone https://github.com/yooobwoood/final_proj_blog.git
 
-
-WORKDIR /home/final_proj_blog
-
+WORKDIR /final_proj_blog
 COPY .env .
 COPY .env.dev .
 COPY .env.prod .
