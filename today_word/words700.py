@@ -60,8 +60,10 @@ def kkma_tokenize(text):
 # Load or create index 
 def load_or_create_index(documents, faiss_index_path, bm25_index_path):
     if not os.path.exists(faiss_index_path):
+        print('s3 download start')
         download_index_from_s3(S3_FAISS_INDEX, faiss_index_path)
     if not os.path.exists(bm25_index_path):
+        print('s3 download start')
         download_index_from_s3(S3_BM25_INDEX, bm25_index_path)
 
     if os.path.exists(faiss_index_path) and os.path.exists(bm25_index_path):
