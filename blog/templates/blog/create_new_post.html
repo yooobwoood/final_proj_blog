@@ -25,7 +25,14 @@
     <!-- Image Upload Field -->
     <div class="mb-3">
         <label for="id_head_image">Head Image</label>
-        <input type="file" name="head_image" id="id_head_image" class="form-control" required>
+        <input type="file" name="head_image" id="id_head_image" class="form-control">
+        <button type="button" class="btn btn-primary mt-2" onclick="generateImage()">Generate Image</button>
+        <!-- 이미지 미리보기 영역 -->
+        <div id="image-preview" class="mt-3">
+            <p>No image generated yet.</p>
+        </div>
+        <!-- hidden input에 이미지 URL 저장 -->
+        <input type="hidden" name="generated_image_url" id="generated_image_url">
     </div>
 
     <div class="mb-3">
@@ -106,5 +113,39 @@
             document.getElementById('loading-spinner').style.display = 'none';
         });
     }
+
+    function generateImage() {
+        const txtResponse = document.getElementById('id_content').value;
+        if (!txtResponse) {
+            alert("Please enter content in the Content field.");
+            return;
+        }
+        // 로딩 스피너 표시
+        document.getElementById('loading-spinner').style.display = 'flex';
+        fetch("{% url 'generate_image' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ txt_response: txtResponse })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // 이미지 미리보기 업데이트
+            const previewDiv = document.getElementById('image-preview');
+            previewDiv.innerHTML = `<img src="${data.file_url}" alt="Generated Image" class="img-thumbnail" width="200">`;
+            // hidden input에 이미지 URL 저장
+            document.getElementById('generated_image_url').value = data.file_url;
+        })
+        .catch(error => console.error('Error:', error))
+        .finally(() => {
+            // 로딩 스피너 숨기기
+            document.getElementById('loading-spinner').style.display = 'none';
+        });
+    }
+
 </script>
+
 {% endblock %}

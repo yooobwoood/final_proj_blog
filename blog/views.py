@@ -16,7 +16,18 @@ from .easystory import (
     generate_response
 )
 from django.http import JsonResponse
+
+from django.conf import settings
+from django.http import JsonResponse
+from .dalle import save_gen_img, OpenAI, BadRequestError
+import json
 import os
+from dotenv import load_dotenv
+from django.core.files import File
+from urllib.request import urlopen
+from tempfile import NamedTemporaryFile
+
+load_dotenv()
 
 # RAG 시스템 초기화
 hybrid_retriever, tokenizer, model, llm_chain = initialize_rag_system()
@@ -49,99 +60,9 @@ class PostDetail(DetailView):
         context['comment_form'] = CommentForm
         return context
 
-class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    model = Post
-    fields = ['title', 'content', 'head_image']
-    template_name = 'blog/create_new_post.html'
-
-    def test_func(self):
-        return self.request.user.is_superuser or self.request.user.is_staff
-
-    def form_valid(self, form):
-        current_user = self.request.user
-        if current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
-            form.instance.author = current_user
-
-            # Save the form to create self.object
-            response = super(PostCreate, self).form_valid(form)
-
-            # 태그 추가
-            tags_str = self.request.POST.get('tags_str')
-            if tags_str:
-                tags_str = tags_str.strip().replace(',', ';')
-                tags_list = tags_str.split(';')
-                for t in tags_list:
-                    t = t.strip()
-                    tag, is_tag_created = Tag.objects.get_or_create(name=t)
-                    if is_tag_created:
-                        tag.slug = slugify(t, allow_unicode=True)
-                        tag.save()
-                    self.object.tags.add(tag)
-
-            return response
-        else:
-            return redirect('/blog/')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        query = self.request.GET.get("query", "")
-        if query:
-            unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
-            debug_output = generate_debug_output(unique_documents, reranked_documents)
-            response = generate_response(query, reranked_documents, llm_chain)
-            context['response'] = response
-            context['debug_output'] = debug_output
-        return context
-
-    def get(self, request, *args, **kwargs):
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest' and 'query' in request.GET:
-            query = request.GET.get('query', "")
-            unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
-            debug_output = generate_debug_output(unique_documents, reranked_documents)
-            response = generate_response(query, reranked_documents, llm_chain)
-            return JsonResponse({
-                "response": response,
-                "debug_output": debug_output
-            })
-        return super().get(request, *args, **kwargs)
     
 
-class PostUpdate(LoginRequiredMixin, UpdateView):
-    model = Post
-    fields = ['title', 'content', 'head_image']
-    template_name = 'blog/post_update_form.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(PostUpdate, self).get_context_data()
-        if self.object.tags.exists():
-            tags_str_list = list()
-            for t in self.object.tags.all():
-                tags_str_list.append(t.name)
-            context['tags_str_default'] = '; '.join(tags_str_list)
-        return context
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and request.user == self.get_object().author:
-            return super(PostUpdate, self).dispatch(request, *args, **kwargs)
-        else:
-            raise PermissionDenied
-
-    def form_valid(self, form):
-        response = super(PostUpdate, self).form_valid(form)
-        self.object.tags.clear()
-        tags_str = self.request.POST.get('tags_str')
-        if tags_str:
-            tags_str = tags_str.strip()
-            tags_str = tags_str.replace(',', ';')
-            tags_list = tags_str.split(';')
-            for t in tags_list:
-                t = t.strip()
-                tag, is_tag_created = Tag.objects.get_or_create(name=t)
-                if is_tag_created:
-                    tag.slug = slugify(t, allow_unicode=True)
-                    tag.save()
-                self.object.tags.add(tag)
-        return response
 
 def new_comment(request, pk):
     if request.user.is_authenticated:
@@ -195,51 +116,135 @@ class PostSearch(PostList):
         context['search_info'] = f'Search: {q}'
         return context
 
-def tag_page(request, slug):
-    tag = Tag.objects.get(slug=slug)
-    post_list = tag.post_set.all()
-    return render(
-        request,
-        'blog/post_list.html',
-        {
-            'post_list': post_list,
-            'tag': tag,
-        }
-    )
 
+def generate_unique_slug(name):
+    slug = slugify(name, allow_unicode=True)
+    unique_slug = slug
+    number = 1
+    while Tag.objects.filter(slug=unique_slug).exists():
+        unique_slug = f"{slug}-{number}"
+        number += 1
+    return unique_slug
 
-def unique_slug_generator(tag_name):
-    slug = slugify(tag_name, allow_unicode=True)
-    original_slug = slug
-    count = 1
-    while Tag.objects.filter(slug=slug).exists():
-        slug = f"{original_slug}-{count}"
-        count += 1
-    return slug
+class PostUpdate(LoginRequiredMixin, UpdateView):
+    model = Post
+    fields = ['title', 'content', 'head_image']
+    template_name = 'blog/post_update_form.html'
 
-def create_post(request):
-    if request.method == "POST":
-        title = request.POST.get("title")
-        content = request.POST.get("content")
-        head_image = request.FILES.get("head_image")
-        tags_str = request.POST.get("tags_str", "")
-        # 새 Post 인스턴스 생성
-        post = Post.objects.create(
-            title=title,
-            content=content,
-            head_image=head_image,
-            author=request.user,
-        )
+    def get_context_data(self, **kwargs):
+        context = super(PostUpdate, self).get_context_data()
+        if self.object.tags.exists():
+            tags_str_list = list()
+            for t in self.object.tags.all():
+                tags_str_list.append(t.name)
+            context['tags_str_default'] = '; '.join(tags_str_list)
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user == self.get_object().author:
+            return super(PostUpdate, self).dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+    def form_valid(self, form):
+        response = super(PostUpdate, self).form_valid(form)
+        self.object.tags.clear()
+        tags_str = self.request.POST.get('tags_str')
         if tags_str:
-            tags_str = tags_str.strip().replace(',', ';')
+            tags_str = tags_str.strip()
+            tags_str = tags_str.replace(',', ';')
             tags_list = tags_str.split(';')
             for t in tags_list:
                 t = t.strip()
-                # 새로운 Tag 인스턴스를 항상 생성하고 고유한 slug 지정
-                slug = unique_slug_generator(t)
-                tag = Tag(name=t, slug=slug)
-                tag.save()  # 고유 slug를 지정한 뒤 저장
-                post.tags.add(tag)  # 태그를 게시물에 추가
-        return redirect(post.get_absolute_url())
-    return render(request, "blog/create_new_post.html")
+                tag, is_tag_created = Tag.objects.get_or_create(name=t)
+                if is_tag_created:
+                    tag.slug = slugify(t, allow_unicode=True)
+                    tag.save()
+                self.object.tags.add(tag)
+        return response
 
+
+
+class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Post
+    fields = ['title', 'content', 'head_image']
+    template_name = 'blog/create_new_post.html'
+
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.is_staff
+
+    def form_valid(self, form):
+        current_user = self.request.user
+        if current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
+            form.instance.author = current_user
+
+            # hidden input에서 이미지 URL 가져오기
+            generated_image_url = self.request.POST.get('generated_image_url')
+            if generated_image_url:
+                # URL에서 이미지를 열어 임시 파일로 저장한 후 head_image에 첨부
+                img_temp = NamedTemporaryFile(delete=True)
+                img_temp.write(urlopen(generated_image_url).read())
+                img_temp.flush()
+                # 파일 이름을 지정하여 저장 (경로를 제거하고 파일명만 사용)
+                file_name = os.path.basename(generated_image_url)
+                form.instance.head_image.save(file_name, File(img_temp), save=False)
+
+            response = super(PostCreate, self).form_valid(form)
+
+            # 태그 추가
+            tags_str = self.request.POST.get('tags_str')
+            if tags_str:
+                tags_str = tags_str.strip().replace(',', ';')
+                tags_list = tags_str.split(';')
+                for t in tags_list:
+                    t = t.strip()
+                    existing_tag = Tag.objects.filter(name=t).first()
+                    if existing_tag:
+                        tag = existing_tag
+                    else:
+                        tag = Tag(name=t)
+                        tag.slug = generate_unique_slug(t)  # 고유 슬러그 생성 함수 사용
+                        tag.save()
+                    self.object.tags.add(tag)
+            return response
+        else:
+            return redirect('/blog/')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get("query", "")
+        if query:
+            unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
+            debug_output = generate_debug_output(unique_documents, reranked_documents)
+            response = generate_response(query, reranked_documents, llm_chain)
+            context['response'] = response
+            context['debug_output'] = debug_output
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' and 'query' in request.GET:
+            query = request.GET.get('query', "")
+            unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
+            debug_output = generate_debug_output(unique_documents, reranked_documents)
+            response = generate_response(query, reranked_documents, llm_chain)
+            return JsonResponse({
+                "response": response,
+                "debug_output": debug_output
+            })
+        return super().get(request, *args, **kwargs)
+    
+
+def generate_image(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        txt_response = data.get("txt_response", "")
+        client = OpenAI(api_key=os.getenv("OPENAI_KEY"))
+
+        try:
+            filename = save_gen_img(client, txt_response)
+            file_url = request.build_absolute_uri(os.path.join(settings.MEDIA_URL, 'generated_images', filename))
+        except BadRequestError:
+            filename = save_gen_img(client, "시장 경제 활동")
+            file_url = request.build_absolute_uri(os.path.join(settings.MEDIA_URL, 'generated_images', filename))
+
+        return JsonResponse({"filename": filename, "file_url": file_url})    

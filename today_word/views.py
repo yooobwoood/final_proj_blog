@@ -49,6 +49,15 @@ class WordDetail(DetailView):
         context['today_news'] = today_news
         return context
 
+def generate_unique_slug(name):
+    slug = slugify(name, allow_unicode=True)
+    unique_slug = slug
+    number = 1
+    while Word_Tag.objects.filter(slug=unique_slug).exists():
+        unique_slug = f"{slug}-{number}"
+        number += 1
+    return unique_slug
+
 class WordCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Word
     fields = ['title', 'content']
@@ -72,9 +81,12 @@ class WordCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
                 tags_list = tags_str.split(';')
                 for t in tags_list:
                     t = t.strip()
-                    tag, is_tag_created = Word_Tag.objects.get_or_create(name=t)
-                    if is_tag_created:
-                        tag.slug = slugify(t, allow_unicode=True)
+                    existing_tag = Word_Tag.objects.filter(name=t).first()
+                    if existing_tag:
+                        tag = existing_tag
+                    else:
+                        tag = Word_Tag(name=t)
+                        tag.slug = generate_unique_slug(t)  # 고유 슬러그 생성 함수 사용
                         tag.save()
                     self.object.tags.add(tag)
 
@@ -157,14 +169,3 @@ class WordSearch(WordList):
         context['search_info'] = f'Search: {q}'
         return context
 
-def tag_page(request, slug):
-    tag = Word_Tag.objects.get(slug=slug)
-    post_list = Word.objects.filter(tags=tag)
-    return render(
-        request,
-        'blog/word_list.html',
-        {
-            'word_list': post_list,
-            'tag': tag,
-        }
-    )

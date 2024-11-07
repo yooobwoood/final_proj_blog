@@ -1,5 +1,7 @@
 from django.urls import path, include
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('search/<str:q>/', views.PostSearch.as_view(), name='post_search'),
@@ -11,5 +13,6 @@ urlpatterns = [
     path('<int:pk>/', views.PostDetail.as_view(), name='post_detail'),
     path('accounts/', include('allauth.urls')),
     path('', views.PostList.as_view(), name='post_list'),
-    path('tag/<str:slug>/', views.tag_page, name='tag_page'),
-]
+    path('generate_image/', views.generate_image, name='generate_image'),
+    
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
