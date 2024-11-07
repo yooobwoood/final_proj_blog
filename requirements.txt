@@ -205,3 +205,4 @@ wget==3.2
 widgetsnbextension==4.0.13
 yarl==1.17.1
 # zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1726248574750/work
+gevent>=1.4
