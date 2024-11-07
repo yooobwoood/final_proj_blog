@@ -6,11 +6,12 @@ services:
     command: gunicorn --workers=1 final_proj_blog.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./:/usr/src/app
+      - ./.env:/usr/src/app/.env         
+      - ./.env.dev:/usr/src/app/.env.dev 
+      - ./.env.prod:/usr/src/app/.env.prod 
+      - ./.env.prod.db:/usr/src/app/.env.prod.db 
     ports:
       - 8000:8000
-    env_file:
-      - ./.env
-      - ./.env.dev
     depends_on:
       - db
   db:

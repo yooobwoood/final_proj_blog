@@ -17,11 +17,12 @@ services:
       - static_volume:/usr/src/app/_static
       - media_volume:/usr/src/app/_media
       - ./:/usr/src/app/
+      - ./.env:/usr/src/app/.env        
+      - ./.env.dev:/usr/src/app/.env.dev 
+      - ./.env.prod:/usr/src/app/.env.prod 
+      - ./.env.prod.db:/usr/src/app/.env.prod.db 
     expose:
       - 8000
-    env_file:
-      - ./.env
-      - ./.env.prod
     depends_on:
       - db
   db:
