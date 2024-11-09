@@ -1,4 +1,4 @@
-# version: '3'
+version: '3'
 
 services:
   nginx:
@@ -7,12 +7,15 @@ services:
       - static_volume:/usr/src/app/_static
       - media_volume:/usr/src/app/_media
     ports:
-      - 80:80
+      - "80:80"
     depends_on:
       - web 
+      
   web:  
     build: .
     command: gunicorn --workers=1 -k gevent final_proj_blog.wsgi:application --bind 0.0.0.0:8000
+    environment:
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS} # ALLOWED_HOSTS 설정
     volumes:
       - static_volume:/usr/src/app/_static
       - media_volume:/usr/src/app/_media
@@ -22,15 +25,17 @@ services:
       - ./.env.prod:/usr/src/app/.env.prod 
       - ./.env.prod.db:/usr/src/app/.env.prod.db 
     expose:
-      - 8000
+      - "8000"
     depends_on:
       - db
+      
   db:
     image: postgres:13.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env.prod.db
+
 volumes:
   postgres_data:
   static_volume:
