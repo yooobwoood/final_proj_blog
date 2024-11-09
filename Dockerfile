@@ -48,5 +48,5 @@ COPY .env.prod.db /usr/src/app/.env.prod.db
 
 # Python 패키지 설치
 RUN pip install --upgrade pip
+RUN pip install django-crontab
 RUN pip install -r requirements.txt
-RUN pip install gevent
