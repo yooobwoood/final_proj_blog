@@ -50,3 +50,7 @@ COPY .env.prod.db /usr/src/app/.env.prod.db
 RUN pip install --upgrade pip
 RUN pip install django-crontab
 RUN pip install -r requirements.txt
+
+# faiss 설정 변경
+RUN cd /usr/local/lib/python3.10/site-packages/faiss && \
+    ln -s swigfaiss.py swigfaiss_avx2.py
