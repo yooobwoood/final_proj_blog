@@ -3,7 +3,7 @@ from blog.models import Post, Word, News
 from django.utils import timezone
 
 def landing(request):
-    recent_posts = Post.objects.order_by('-pk')[:4]
+    recent_posts = Post.objects.order_by('-pk')[:3]
     recent_word = Word.objects.order_by('-pk')[:1]
 
     today = timezone.now().date()

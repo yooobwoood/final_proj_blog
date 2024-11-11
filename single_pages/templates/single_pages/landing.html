@@ -37,6 +37,7 @@
                         <div class="card mt-3" style="border-radius: 0; box-shadow: none; border: 1px solid #ccc;">
                             <div class="card-body" style="padding: 10px;">
                                 <h5><a href="{{ word.get_absolute_url }}" class="text-decoration-none" style="font-size: 1.25rem; font-weight: 600; color: #000;">{{ word.title }}</a></h5>
+                                <p class="text-muted" style="font-size: 0.9rem;">{{ word.created_at|date:"Y년 m월 d일 H:i" }}</p>
                                 <p style="font-size: 1rem; color: #666;">{{ word.get_content_markdown | truncatewords_html:20 | safe }}</p>
                             </div>
                         </div>
@@ -48,7 +49,12 @@
                     <h4 class="text-dark" style="font-weight: 700; font-size: 1.5rem; color: #333;">오늘의 뉴스</h4>
                     <ul style="list-style: none; padding-left: 0;">
                         {% for news in today_news %}
-                            <li><a href="{{ news.get_absolute_url }}" class="text-decoration-none" style="font-size: 1rem; color: #333;">{{ news.title }}</a></li>
+                            <div class="card mt-3" style="border-radius: 0; box-shadow: none; border: 1px solid #ccc;">
+                                <div class="card-body" style="padding: 10px;">
+                                    <h5><a href="{{ news.get_absolute_url }}" class="text-decoration-none" style="font-size: 1rem; color: #333;">{{ news.title }}</a></h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">{{ news.created_at|date:"Y년 m월 d일 H:i" }}</p>
+                                </div>
+                            </div>
                         {% empty %}
                             <li>오늘의 뉴스가 없습니다.</li>
                         {% endfor %}
@@ -63,6 +69,7 @@
                     <div class="card mt-3" style="border-radius: 0; box-shadow: none; border: 1px solid #ccc;">
                         <div class="card-body" style="padding: 15px;">
                             <h5><a href="{{ post.get_absolute_url }}" class="text-decoration-none" style="font-size: 1.25rem; font-weight: 600; color: #000;">{{ post.title }}</a></h5>
+                            <p class="text-muted" style="font-size: 0.9rem;">{{ post.created_at|date:"Y년 m월 d일 H:i" }}</p>
                         </div>
                     </div>
                 {% endfor %}
