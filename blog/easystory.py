@@ -25,6 +25,9 @@ load_dotenv()
 
 from final_proj_blog.utils import download_index_from_s3, load_index
 
+if not os.path.isdir('./index'):
+    os.mkdir('./index')
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_PATH = os.path.join(BASE_DIR, "data", "corpus-easystory.parquet")
 FAISS_INDEX_PATH = os.path.join(BASE_DIR, "index", "easystory_faiss_index.pkl")
@@ -103,7 +106,7 @@ def initialize_reranker(model_path="Dongjin-kr/ko-reranker"):
 # Rerank Function
 def rerank(query, retrieved_documents, tokenizer, model, top_k=5):
     pairs = [[query, doc.page_content] for doc in retrieved_documents]
-    inputs = tokenizer(pairs, padding=True, truncation=True, return_tensors='pt', max_length=1024) 
+    inputs = tokenizer(pairs, padding=True, truncation=True, return_tensors='pt', max_length=256) 
     with torch.no_grad():
         scores = model(**inputs, return_dict=True).logits.view(-1).float()
     reranked_docs = sorted(zip(retrieved_documents, scores), key=lambda x: x[1], reverse=True)
@@ -158,7 +161,7 @@ def initialize_llm_chain():
         답변:
         """
     )
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
+    llm = ChatOpenAI(model="gpt-4o", temperature=0.3)
     return LLMChain(llm=llm, prompt=prompt_template)
 
 # Initialize RAG System

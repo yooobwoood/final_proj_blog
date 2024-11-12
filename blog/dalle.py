@@ -48,11 +48,15 @@ def save_gen_img(client, txt_response: str):
     image_data_b64 = img_response.data[0].b64_json
     _image_bytes = base64.b64decode(image_data_b64)
     image_bytes = resize_to_half_height(_image_bytes)
+    
     # 저장 경로와 파일명 설정
     gentime_info = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{gentime_info}.png"
-    file_path = os.path.join(settings.MEDIA_ROOT, 'generated_images', filename)
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    folder_path = os.path.join(settings.MEDIA_ROOT, 'generated_images')
+    file_path = os.path.join(folder_path, filename)
+
+    os.makedirs(folder_path, exist_ok=True)
+
     with open(file_path, 'wb') as img_file:
         img_file.write(image_bytes)
     return filename
