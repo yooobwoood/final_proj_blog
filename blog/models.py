@@ -114,16 +114,21 @@ class News(models.Model):
     def get_absolute_url(self):
         return f'/news/{self.pk}/'
 
-    def get_file_name(self):
-        return os.path.basename(self.file_upload.name)
-
-    def get_file_ext(self):
-        return self.get_file_name().split('.')[-1]
-
     def get_content_markdown(self):
         return markdown(self.content)
 
 
+class Subject(models.Model):
+    no = models.AutoField(primary_key=True, default=1)
+    category = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+    use_yn = models.BooleanField()
 
 
+class RelatedWord(models.Model):
+    no = models.IntegerField(primary_key=True)
+    origin_num = models.IntegerField()
+    origin_word = models.CharField(max_length=255)
+    related_num = models.CharField(max_length=255, null=True)
+    related_word = models.CharField(max_length=255)
 

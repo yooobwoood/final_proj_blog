@@ -2,7 +2,7 @@ from lib2to3.fixes.fix_input import context
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from news.models import News
+from blog.models import News
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from blog.forms import CommentForm

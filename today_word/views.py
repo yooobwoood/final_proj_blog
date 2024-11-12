@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils.text import slugify
-from blog.models import Word, Word_Tag, News
+from blog.models import Word, Word_Tag, News, Subject, RelatedWord
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.utils import timezone
@@ -40,7 +40,7 @@ class WordDetail(DetailView):
     model = Word
 
     def get_context_data(self, **kwargs):
-        context = super(WordDetail, self).get_context_data()
+        context = super(WordDetail, self).get_context_data(**kwargs)
         context['tags'] = Word_Tag.objects.all()
         # 오늘 날짜의 뉴스 필터링
         today = timezone.now().date()
@@ -74,8 +74,17 @@ class WordCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             # Save the form to create self.object
             response = super(WordCreate, self).form_valid(form)
 
+            query = self.request.session.get('query')
+
+            # Subject 테이블 업데이트
+            title_instance = Subject.objects.filter(title=query).first()
+            if title_instance:
+                title_instance.use_yn = True
+                title_instance.save()
+
             # Now that self.object is created, you can add tags to it
-            tags_str = self.request.POST.get('tags_str')
+            tags = self.request.session.get('tags')
+            tags_str = ", ".join(tags)
             if tags_str:
                 tags_str = tags_str.strip().replace(',', ';')
                 tags_list = tags_str.split(';')
@@ -96,18 +105,26 @@ class WordCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        query = self.request.GET.get("query", "")
+        query = Subject.objects.filter(category='word', use_yn=False).order_by('?').values_list('title', flat=True).first()
+        context['title'] = query
+        self.request.session['query'] = query
         if query:
             unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
             debug_output = generate_debug_output(unique_documents, reranked_documents)
             response = generate_response(query, reranked_documents, llm_chain)
+            tags = list(RelatedWord.objects.filter(origin_word=query).values_list('related_word', flat=True))
+
             context['response'] = response
             context['debug_output'] = debug_output
+            context['tags'] = tags
+            self.request.session['tags'] = tags
+        else:
+            context['tags'] = None
         return context
 
     def get(self, request, *args, **kwargs):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest' and 'query' in request.GET:
-            query = request.GET.get('query', "")
+            query = self.request.session.get('query')
             unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
             debug_output = generate_debug_output(unique_documents, reranked_documents)
             response = generate_response(query, reranked_documents, llm_chain)

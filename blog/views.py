@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.utils.text import slugify
 from django.shortcuts import get_object_or_404
-from .models import Post, Tag, Comment, News
+from .models import Post, Tag, Comment, News, Subject
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from .forms import CommentForm
@@ -191,6 +191,14 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
             response = super(PostCreate, self).form_valid(form)
 
+            query = self.request.session.get('query')
+
+            # Subject 테이블 업데이트
+            title_instance = Subject.objects.filter(title=query).first()
+            if title_instance:
+                title_instance.use_yn = True
+                title_instance.save()
+
             # 태그 추가
             tags_str = self.request.POST.get('tags_str')
             if tags_str:
@@ -212,7 +220,12 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        query = self.request.GET.get("query", "")
+
+        # use_yn=False인 질문 중 랜덤 선택
+        query = Subject.objects.filter(category='post', use_yn=False).order_by('?').values('title').first()['title']
+        context['title'] = query
+        self.request.session['query'] = query
+
         if query:
             unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
             debug_output = generate_debug_output(unique_documents, reranked_documents)
@@ -223,7 +236,7 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def get(self, request, *args, **kwargs):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest' and 'query' in request.GET:
-            query = request.GET.get('query', "")
+            query = self.request.session.get('query')
             unique_documents, reranked_documents = generate_answer(query, hybrid_retriever, tokenizer, model)
             debug_output = generate_debug_output(unique_documents, reranked_documents)
             response = generate_response(query, reranked_documents, llm_chain)
