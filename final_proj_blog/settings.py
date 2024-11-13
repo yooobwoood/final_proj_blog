@@ -190,6 +190,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #crontab
 CRONJOBS = [
-    ('0 0 * * *', 'final_proj_blog.cron.news_create'),
-    ('0 0 * * *', 'final_proj_blog.cron.word_create'),
+    ('*/5 * * * *', 'final_proj_blog.cron.news_create', '>> schedule.log'),
+    ('*/5 * * * *', 'final_proj_blog.cron.word_create', '>> schedule.log'),
 ]
