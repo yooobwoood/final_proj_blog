@@ -3,7 +3,7 @@
 {% block main_area %}
 <h2>Create New Post</h2>
 <hr/>
-<form method="post" action="{% url 'post_create' %}" enctype="multipart/form-data">
+<form method="post" action="{% url 'post_create' %}">
     {% csrf_token %}
     
     <div class="mb-3">
