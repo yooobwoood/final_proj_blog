@@ -23,27 +23,16 @@ admin.site.register(Tag, TagAdmin)
 # admin.site.register(Word_Category, CategoryAdmin)
 admin.site.register(Word_Tag, TagAdmin)
 
-
-# `is_active` 필터와 디스플레이 추가
-class CustomUserAdmin(DefaultUserAdmin):
-    list_filter = ('is_active', 'is_staff', 'is_superuser')  # 필터에 is_active 추가
-    list_display = ('username', 'email', 'is_active', 'is_staff')  # 목록에 is_active 표시
-
-# 기본 UserAdmin을 CustomUserAdmin으로 덮어쓰기
-admin.site.unregister(User)
-admin.site.register(User, CustomUserAdmin)
-
-
 # Subject 모델 설정
 class SubjectResource(resources.ModelResource):
 	class Meta:
 		model = Subject
-		fields = ('no', 'category', 'name', 'use_yn')
-		export_order = fields
+		exclude = ('category', 'title', 'use_yn')
+		import_id_fields=['no']
    
 class SubjectAdmin(ImportExportModelAdmin):
-	fields = ('category', 'name', 'use_yn')
-	list_display = ('no', 'category', 'name', 'use_yn')
+	fields = ('no', 'category', 'title', 'use_yn')
+	list_display = ('no', 'category', 'title', 'use_yn')
 	resource_class = SubjectResource
  
 admin.site.register(Subject, SubjectAdmin)
@@ -53,12 +42,21 @@ admin.site.register(Subject, SubjectAdmin)
 class RelatedWordResource(resources.ModelResource):
 	class Meta:
 		model = RelatedWord
-		fields = ('no',	'origin_num',	'origin_word', 'related_num',	'related_word')
-		export_order = fields
+		exclude = ('origin_num', 'origin_word', 'related_num',	'related_word')
+		import_id_fields=['no']
    
 class RelatedWordAdmin(ImportExportModelAdmin):
-	fields = ('origin_num',	'origin_word', 'related_num',	'related_word')
+	fields = ('no', 'origin_num',	'origin_word', 'related_num',	'related_word')
 	list_display = ('no', 'origin_num',	'origin_word', 'related_num',	'related_word')
 	resource_class = RelatedWordResource
  
 admin.site.register(RelatedWord, RelatedWordAdmin)
+
+# `is_active` 필터와 디스플레이 추가
+class CustomUserAdmin(DefaultUserAdmin):
+    list_filter = ('is_active', 'is_staff', 'is_superuser')  # 필터에 is_active 추가
+    list_display = ('username', 'email', 'is_active', 'is_staff')  # 목록에 is_active 표시
+
+# 기본 UserAdmin을 CustomUserAdmin으로 덮어쓰기
+admin.site.unregister(User)
+admin.site.register(User, CustomUserAdmin)
