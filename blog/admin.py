@@ -41,7 +41,7 @@ class SubjectResource(resources.ModelResource):
 		fields = ('no', 'category', 'name', 'use_yn')
 		export_order = fields
    
-class SubjectAdmin(ImportExportModelAdmin)
+class SubjectAdmin(ImportExportModelAdmin):
 	fields = ('category', 'name', 'use_yn')
 	list_display = ('no', 'category', 'name', 'use_yn')
 	resource_class = SubjectResource
@@ -56,7 +56,7 @@ class RelatedWordResource(resources.ModelResource):
 		fields = ('no',	'origin_num',	'origin_word', 'related_num',	'related_word')
 		export_order = fields
    
-class RelatedWordAdmin(ImportExportModelAdmin)
+class RelatedWordAdmin(ImportExportModelAdmin):
 	fields = ('origin_num',	'origin_word', 'related_num',	'related_word')
 	list_display = ('no', 'origin_num',	'origin_word', 'related_num',	'related_word')
 	resource_class = RelatedWordResource
