@@ -5,6 +5,10 @@ from .models import Post, Tag, Comment, Word, Word_Tag, News
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
+from .models import Subject, RelatedWord
+
 admin.site.register(Post, MarkdownxModelAdmin)
 admin.site.register(Word, MarkdownxModelAdmin)
 admin.site.register(News, MarkdownxModelAdmin)
@@ -28,3 +32,33 @@ class CustomUserAdmin(DefaultUserAdmin):
 # 기본 UserAdmin을 CustomUserAdmin으로 덮어쓰기
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
+
+
+# Subject 모델 설정
+class SubjectResource(resources.ModelResource):
+	class Meta:
+		model = Subject
+		fields = ('no', 'category', 'name', 'use_yn')
+		export_order = fields
+   
+class SubjectAdmin(ImportExportModelAdmin)
+	fields = ('category', 'name', 'use_yn')
+	list_display = ('no', 'category', 'name', 'use_yn')
+	resource_class = SubjectResource
+ 
+admin.site.register(Subject, SubjectAdmin)
+
+
+# RelatedWord 모델 설정
+class RelatedWordResource(resources.ModelResource):
+	class Meta:
+		model = RelatedWord
+		fields = ('no',	'origin_num',	'origin_word', 'related_num',	'related_word')
+		export_order = fields
+   
+class RelatedWordAdmin(ImportExportModelAdmin)
+	fields = ('origin_num',	'origin_word', 'related_num',	'related_word')
+	list_display = ('no', 'origin_num',	'origin_word', 'related_num',	'related_word')
+	resource_class = RelatedWordResource
+ 
+admin.site.register(RelatedWord, RelatedWordAdmin)

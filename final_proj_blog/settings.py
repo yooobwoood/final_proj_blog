@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
 
     'markdownx',
+    'import_export',
     'django.contrib.sites',
     'allauth',
     'allauth.account',

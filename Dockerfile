@@ -21,6 +21,7 @@ RUN apt-get update && \
     cd sqlite-autoconf-3420000 && \
     ./configure && make && make install && \
     rm -rf sqlite-autoconf-3420000.tar.gz sqlite-autoconf-3420000
+    
 
 ENV LD_LIBRARY_PATH="/usr/local/lib:/usr/lib/x86_64-linux-gnu"
 ENV JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
@@ -49,6 +50,7 @@ COPY .env.prod.db /usr/src/app/.env.prod.db
 # Python 패키지 설치
 RUN pip install --upgrade pip
 RUN pip install django-crontab
+RUN pip install django-import-export
 RUN pip install -r requirements.txt
 
 # faiss 설정 변경
