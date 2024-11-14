@@ -197,8 +197,6 @@ CRONJOBS = [
 ]
 
 
-(... 생략 ...)
-
 # 로깅설정
 LOGGING = {
     'version': 1,
@@ -258,5 +256,4 @@ LOGGING = {
             'propagate': False,
         },
     }
-}
 }
