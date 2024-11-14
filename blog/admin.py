@@ -27,27 +27,19 @@ admin.site.register(Word_Tag, TagAdmin)
 class SubjectResource(resources.ModelResource):
 	class Meta:
 		model = Subject
-		fields = ('no', 'category', 'title', 'use_yn')
-		export_order = fields
    
+@admin.register(Subject)
 class SubjectAdmin(ImportExportModelAdmin):
-	fields = ('no', 'category', 'title', 'use_yn')
-	list_display = ('no', 'category', 'title', 'use_yn')
 	resource_class = SubjectResource
- 
-admin.site.register(Subject, SubjectAdmin)
 
 
 # RelatedWord 모델 설정
 class RelatedWordResource(resources.ModelResource):
 	class Meta:
 		model = RelatedWord
-		fields = ('no', 'origin_num', 'origin_word', 'related_num',	'related_word')
-		export_order = fields
-   
+
+@admin.register(RelatedWord)   
 class RelatedWordAdmin(ImportExportModelAdmin):
-	fields = ('no', 'origin_num',	'origin_word', 'related_num',	'related_word')
-	list_display = ('no', 'origin_num',	'origin_word', 'related_num',	'related_word')
 	resource_class = RelatedWordResource
  
 admin.site.register(RelatedWord, RelatedWordAdmin)
