@@ -8,10 +8,6 @@ services:
       - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
     volumes:
       - ./:/usr/src/app
-      - ./.env:/usr/src/app/.env         
-      - ./.env.dev:/usr/src/app/.env.dev 
-      - ./.env.prod:/usr/src/app/.env.prod 
-      - ./.env.prod.db:/usr/src/app/.env.prod.db 
     ports:
       - "8000:8000"
     depends_on:
@@ -22,9 +18,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=yooobwoood
-      - POSTGRES_PASSWORD=1234
-      - POSTGRES_DB=final_proj_blog_dev
+      - POSTGRES_USER="mysuperuser"
+      - POSTGRES_PASSWORD="mysuperuser"
+      - POSTGRES_DB="backendcourse"
 
 volumes:
   postgres_data:

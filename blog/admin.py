@@ -27,8 +27,8 @@ admin.site.register(Word_Tag, TagAdmin)
 class SubjectResource(resources.ModelResource):
 	class Meta:
 		model = Subject
-		exclude = ('category', 'title', 'use_yn')
-		import_id_fields=['no']
+		fields = ('no', 'category', 'title', 'use_yn')
+		export_order = fields
    
 class SubjectAdmin(ImportExportModelAdmin):
 	fields = ('no', 'category', 'title', 'use_yn')
@@ -42,8 +42,8 @@ admin.site.register(Subject, SubjectAdmin)
 class RelatedWordResource(resources.ModelResource):
 	class Meta:
 		model = RelatedWord
-		exclude = ('origin_num', 'origin_word', 'related_num',	'related_word')
-		import_id_fields=['no']
+		fields = ('no', 'origin_num', 'origin_word', 'related_num',	'related_word')
+		export_order = fields
    
 class RelatedWordAdmin(ImportExportModelAdmin):
 	fields = ('no', 'origin_num',	'origin_word', 'related_num',	'related_word')

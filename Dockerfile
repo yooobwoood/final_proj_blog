@@ -42,7 +42,6 @@ RUN git clone https://github.com/yooobwoood/final_proj_blog.git /usr/src/app
 WORKDIR /usr/src/app
 
 # 환경 파일 복사
-COPY .env /usr/src/app/.env
 COPY .env.dev /usr/src/app/.env.dev
 COPY .env.prod /usr/src/app/.env.prod
 COPY .env.prod.db /usr/src/app/.env.prod.db
