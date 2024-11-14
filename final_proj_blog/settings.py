@@ -106,27 +106,17 @@ WSGI_APPLICATION = 'final_proj_blog.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
-#         'NAME': os.environ.get('SQL_DATABASE', os.path.join(BASE_DIR, 'db.sqlite3')),
-#         'USER': os.environ.get('SQL_USER', 'user'),
-#         'PASSWORD': os.environ.get('SQL_PASSWORD', 'password'),
-#         'HOST': os.environ.get('SQL_HOST', 'localhost'),
-#         'PORT': os.environ.get('SQL_PORT', '5432'),
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('SQL_ENGINE'),
-        'NAME': os.getenv('SQL_DATABASE'),
-        'USER': os.getenv('SQL_USER'),
-        'PASSWORD': os.getenv('SQL_PASSWORD'),
-        'HOST': os.getenv('SQL_HOST'),
-        'PORT': os.getenv('SQL_PORT'),
+        'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.environ.get('SQL_DATABASE', os.path.join(BASE_DIR, 'db.sqlite3')),
+        'USER': os.environ.get('SQL_USER', 'user'),
+        'PASSWORD': os.environ.get('SQL_PASSWORD', 'password'),
+        'HOST': os.environ.get('SQL_HOST', 'localhost'),
+        'PORT': os.environ.get('SQL_PORT', '5432'),
     }
 }
+
 
 # AWS settings
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
