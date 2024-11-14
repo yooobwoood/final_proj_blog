@@ -195,3 +195,23 @@ CRONJOBS = [
     ('0 0 * * *', 'final_proj_blog.cron.news_create'),
     ('0 0 * * *', 'final_proj_blog.cron.word_create'),
 ]
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': '../logs/django_errors.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
