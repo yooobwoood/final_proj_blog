@@ -42,7 +42,6 @@ class RelatedWordResource(resources.ModelResource):
 class RelatedWordAdmin(ImportExportModelAdmin):
 	resource_class = RelatedWordResource
  
-admin.site.register(RelatedWord, RelatedWordAdmin)
 
 # `is_active` 필터와 디스플레이 추가
 class CustomUserAdmin(DefaultUserAdmin):
